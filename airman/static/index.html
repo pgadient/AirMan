@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFC62B" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1A2550" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="AirMan – your speakers, your music">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="AirMan">
+  <title>AirMan</title>
+  <link rel="icon" id="favicon-day" href="icons/day/favicon.svg" type="image/svg+xml"
+        media="(prefers-color-scheme: light)">
+  <link rel="icon" id="favicon-night" href="icons/night/favicon.svg" type="image/svg+xml"
+        media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="icons/night/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="icons/night/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main id="login" class="login" hidden>
+    <img class="logo" src="banners/mascot-note.svg" alt="" width="200" height="200">
+    <h1>AirMan</h1>
+    <p class="slogan">Your speakers, your music</p>
+    <form id="login-form">
+      <input id="password" type="password" autocomplete="current-password" required
+             data-i18n-placeholder="password">
+      <button type="submit" class="primary" data-i18n="login">Login</button>
+      <p id="login-error" class="error" role="alert"></p>
+    </form>
+    <p class="muted center small">
+      <a href="airman-ca.crt" data-i18n="installCert">Zertifikat installieren (optional)</a>
+    </p>
+  </main>
+
+  <main id="app" hidden>
+    <div class="hero">
+      <!-- At night a tap on the mascot switches between the moon and the note. -->
+      <button id="mascot" class="hero-mascot" type="button"></button>
+      <div class="hero-text">
+        <h1>AirMan</h1>
+        <p>Your speakers, your music</p>
+      </div>
+      <div class="hero-tools">
+      <button id="lang-toggle" class="theme-btn" type="button"></button>
+      <button id="theme-toggle" class="theme-btn" type="button">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="4.5"/>
+          <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+          <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z"/>
+        </svg>
+      </button>
+      </div>
+    </div>
+    <p id="disk-warning" class="warning" role="status" hidden></p>
+    <header>
+      <form id="search-form" class="search" role="search">
+        <input id="query" type="search" enterkeyhint="search" autocomplete="off"
+               data-i18n-placeholder="searchPlaceholder">
+        <button type="submit" class="icon-btn" aria-label="Search">⌕</button>
+      </form>
+      <div class="tab-row">
+        <div id="source-tabs" class="tabs" role="tablist"></div>
+        <div id="mode-toggle" class="segmented"></div>
+      </div>
+    </header>
+
+    <section id="results" class="results" hidden>
+      <div class="results-head">
+        <span id="results-info"></span>
+        <button id="upload-btn" class="link" type="button" data-i18n="upload" hidden>Hochladen</button>
+        <input id="upload-input" type="file" multiple hidden
+               accept="audio/*,.mp3,.m4a,.aac,.flac,.wav,.ogg,.oga,.opus,.wma,.aiff,.aif,.alac,.webm,.mka,.mp4">
+        <button id="results-close" class="link" data-i18n="close">Schliessen</button>
+      </div>
+      <ul id="results-list"></ul>
+    </section>
+
+    <section id="speakers" class="speakers"></section>
+    <p id="no-speakers" class="muted center" hidden data-i18n="noSpeakers"></p>
+
+    <div class="support">
+      <a class="support-btn coffee" href="https://ko-fi.com/pascalmontico" target="_blank"
+         rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5Z"/>
+          <path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/>
+          <path d="M8 3c-.6.8-.6 1.7 0 2.5M12 3c-.6.8-.6 1.7 0 2.5"/>
+        </svg>
+        <span data-i18n="coffee">Buy me a coffee</span>
+      </a>
+      <button id="report-bug" class="support-btn bug" type="button">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="7" y="8" width="10" height="12" rx="5"/>
+          <path d="M9.5 8a2.5 2.5 0 0 1 5 0M12 12v8M7 13H3M21 13h-4M7 17l-3 2M17 17l3 2M7 9.5 4.5 7M17 9.5 19.5 7"/>
+        </svg>
+        <span data-i18n="reportBug">Report bug</span>
+      </button>
+    </div>
+
+    <footer>
+      <button id="rescan" class="link" data-i18n="rescan">Lautsprecher suchen</button>
+      <button id="logout" class="link" data-i18n="logout">Abmelden</button>
+    </footer>
+    <p id="version" class="muted center small"></p>
+  </main>
+
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <p id="sheet-title" class="sheet-title"></p>
+      <p id="sheet-hint" class="muted" data-i18n="playOn">Abspielen auf</p>
+      <div id="sheet-speakers" class="sheet-speakers"></div>
+      <button id="sheet-cancel" class="link" data-i18n="cancel">Abbrechen</button>
+    </div>
+  </div>
+
+  <div id="lang-sheet" class="sheet" hidden>
+    <div class="sheet-panel" role="dialog" aria-modal="true">
+      <div id="lang-list" class="sheet-speakers"></div>
+      <button id="lang-cancel" class="link" data-i18n="cancel">Abbrechen</button>
+    </div>
+  </div>
+
+  <div id="logs-sheet" class="sheet" hidden>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="logs-title">
+      <p id="logs-title" class="sheet-title" data-i18n="logsTitle">Logs senden</p>
+      <p class="muted small" data-i18n="logsHint"></p>
+      <div id="logs-actions" class="sheet-speakers"></div>
+      <button id="logs-cancel" class="link" data-i18n="cancel">Abbrechen</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

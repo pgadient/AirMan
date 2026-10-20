@@ -1,0 +1,503 @@
+/* Day mode: sun yellow. --accent fills buttons and sliders, --link is the
+   readable text version of it. */
+:root {
+  --bg: #FFF7D6;
+  --page: #8CC8F0 url("banners/tile-day.svg"); /* the sky of the sun banner, as tiles */
+  --hero-title: #1D2B5C;
+  --hero-tagline: #2E4A7A;
+  --hero-btn: #FFFFFF;
+  --hero-btn-line: #8FA6CC;
+  --card: #FFFDF3;
+  --text: #1A2550;
+  --muted: #6B6440;
+  --line: #F0E2A8;
+  --accent: #FFC62B;
+  --accent-text: #1A2550;
+  --link: #8A5A00;
+  --control: #B07A00; /* sliders: yellow alone is too faint on cream */
+  --danger: #B3261E;
+  --ok: #1E7B45;
+  --radius: 14px;
+  color-scheme: light;
+}
+
+/* Night mode: the night blue of the icon, with the moon as accent. It follows
+   the device setting until the day/night button picks one (data-theme). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="day"]) {
+    --bg: #10173A;
+    --page: #1A2550 url("banners/tile-night.svg"); /* the night sky of the banners, as tiles */
+    --hero-title: #FFFFFF;
+    --hero-tagline: #FFE9A8;
+    --hero-btn: #1A2550;
+    --hero-btn-line: #5A6AA8;
+    --card: #232F66;
+    --text: #F3F5FF;
+    --muted: #AEB7DA;
+    --line: #3A4A88;
+    --accent: #FFE9A8;
+    --accent-text: #1A2550;
+    --link: #FFE9A8;
+    --control: #FFE9A8;
+    --danger: #FF8A80;
+    --ok: #7BE0A4;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="night"],
+:root[data-view="login"] { /* the login page always shows the note on the night sky */
+  --bg: #10173A;
+  --page: #1A2550 url("banners/tile-night.svg");
+  --hero-title: #FFFFFF;
+  --hero-tagline: #FFE9A8;
+  --hero-btn: #1A2550;
+  --hero-btn-line: #5A6AA8;
+  --card: #232F66;
+  --text: #F3F5FF;
+  --muted: #AEB7DA;
+  --line: #3A4A88;
+  --accent: #FFE9A8;
+  --accent-text: #1A2550;
+  --link: #FFE9A8;
+  --control: #FFE9A8;
+  --danger: #FF8A80;
+  --ok: #7BE0A4;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--page);
+  /* fixed, so the sticky search bar (same tiles) lines up with the page seamlessly */
+  background-attachment: fixed;
+  color: var(--text);
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+[hidden] { display: none !important; }
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  /* Side padding grows with the notch in landscape. */
+  padding: 12px max(16px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+/* Every block has the same width as the page column; long titles never push it wider. */
+main > *, .speakers > *, .card > *, .results li, .now { min-width: 0; max-width: 100%; }
+
+button, input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+button:disabled { opacity: .5; cursor: default; }
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+button.link {
+  border: 0;
+  background: none;
+  color: var(--link);
+  padding: 8px;
+}
+
+input[type="search"], input[type="password"] {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.error { color: var(--danger); min-height: 1.4em; }
+.small { font-size: 13px; }
+a { color: var(--link); }
+
+/* login */
+.login { max-width: 360px; padding-top: 10vh; text-align: center; }
+.login h1 { margin: 12px 0 0; }
+.logo { display: block; margin: 0 auto -16px; }
+.slogan { color: var(--muted); margin: 4px 0 24px; }
+.login form { display: grid; gap: 12px; }
+
+/* Page header: only the mascot of the banners, standing on the tiled sky of
+   the page, with the title set in HTML next to it. The music note is the
+   default; a manually chosen day or night mode shows the sun or the moon. */
+.hero {
+  position: relative;
+  isolation: isolate; /* keeps the haze below the mascot and the text */
+  display: flex;
+  align-items: center;
+  height: 170px;
+  padding: 0 108px 0 180px;
+  margin-bottom: 10px;
+  color: var(--hero-title);
+}
+/* A soft haze in the card colour, so the stars and clouds of the page do not
+   run through the title and the mascot. */
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 8px -6px;
+  border-radius: 48px;
+  background: var(--card);
+  opacity: .9;
+  filter: blur(14px);
+}
+/* The mascot is drawn on its button, which a tap at night switches between
+   the moon and the note. Larger than the box and anchored at the bottom: the
+   empty glow above the figure is cut off, so it sits lower and bigger. */
+.hero-mascot {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 190px;
+  padding: 0; border: 0; border-radius: 0; min-height: 0;
+  background: url("banners/mascot-note.svg") left -10px bottom -13px / auto 115% no-repeat;
+  pointer-events: none;
+}
+:root[data-banner="night"] .hero-mascot { background-image: url("banners/mascot-moon.svg"); }
+:root[data-banner="day"] .hero-mascot { background-image: url("banners/mascot-sun.svg"); }
+:root[data-night-look] .hero-mascot { pointer-events: auto; cursor: pointer; }
+.hero-text { min-width: 0; }
+.hero h1 { margin: 0; font-size: clamp(1.7rem, 7vw, 3rem); font-weight: 700; letter-spacing: -0.02em;
+  line-height: 1; }
+.hero p { margin: .3em 0 0; font-size: clamp(.85rem, 2.6vw, 1.15rem); color: var(--hero-tagline); }
+.hero-tools { position: absolute; top: 10px; right: 0; display: flex; gap: 8px; }
+.hero .theme-btn { background: var(--hero-btn); border-color: var(--hero-btn-line);
+  color: var(--hero-title); }
+/* Phones: a smaller mascot. Text and mascot are both centred in the box; the
+   buttons move to the very top, so the title stays clear of them. */
+@media (max-width: 640px) {
+  .hero {
+    height: 140px;
+    padding: 0 0 0 140px;
+  }
+  .hero-mascot { width: 160px; background-position: left -8px bottom -14px; }
+  .hero-tools { top: 0; }
+  .hero h1 { font-size: 1.75rem; }
+  .hero p { font-size: .85rem; }
+}
+/* Very narrow phones: smaller text, so the title fits below the buttons. */
+@media (max-width: 360px) {
+  .hero { padding-left: 126px; }
+  .hero h1 { font-size: 1.45rem; }
+  .hero p { font-size: .75rem; }
+}
+
+.theme-btn {
+  flex: none;
+  width: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+}
+
+.warning {
+  background: #FFD45C;
+  color: #1A2550;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* header + search */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--page);
+  background-attachment: fixed;
+  padding: 4px 0 8px;
+}
+
+.search { display: flex; gap: 8px; }
+.icon-btn { min-width: 48px; font-size: 20px; padding: 0; }
+
+.tabs { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; }
+.tabs button {
+  min-height: 34px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.tabs button[aria-selected="true"] {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+/* Source tabs and the mode toggle share a row; on narrow phones the toggle wraps. */
+.tab-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px; margin-top: 8px; }
+.tab-row .tabs { margin-top: 0; }
+.segmented { display: flex; flex: none; border: 1px solid var(--line); border-radius: 999px;
+  padding: 2px; background: var(--card); }
+.segmented button { min-height: 30px; padding: 2px 12px; border: 0; border-radius: 999px;
+  font-size: 14px; background: none; }
+.segmented button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text);
+  font-weight: 600; }
+
+/* playlist of a speaker */
+.playlist { margin-top: 10px; }
+.queue { list-style: none; margin: 0; padding: 0; }
+.queue li { display: flex; align-items: center; gap: 4px; border-radius: 10px; }
+.queue li + li { border-top: 1px solid var(--line); }
+.queue li.current { background: var(--line); }
+.queue li.empty { padding: 8px 4px; }
+.queue .result { flex: 1; min-width: 0; padding: 8px 4px; }
+.queue-tools { display: flex; flex: none; gap: 2px; }
+.icon-btn.small { min-width: 34px; min-height: 34px; padding: 0; font-size: 13px; }
+
+/* search results */
+.results {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.results-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 4px 4px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--muted);
+}
+.results ul { list-style: none; margin: 0; padding: 0; max-height: 55vh; overflow-y: auto; }
+.results li + li { border-top: 1px solid var(--line); }
+.result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 10px 14px;
+}
+.result:active { background: var(--line); }
+.result-row { display: flex; align-items: center; padding-right: 8px; }
+.result-row .result { flex: 1; min-width: 0; }
+#results-info { flex: 1; min-width: 0; }
+.result .text { min-width: 0; flex: 1; }
+.thumb {
+  flex: none;
+  width: 64px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--line);
+}
+.thumb-icon { display: grid; place-items: center; font-size: 18px; }
+
+.title {
+  display: block;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.subtitle {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* speaker cards */
+.speakers { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.card.offline { opacity: .55; }
+
+.card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.card-head h2 { font-size: 18px; margin: 0; flex: 1; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: none; }
+.dot.playing { background: var(--ok); }
+.dot.loading { background: var(--control); animation: pulse 1s infinite alternate; }
+.dot.error { background: var(--danger); }
+@keyframes pulse { to { opacity: .3; } }
+
+.now { min-height: 44px; margin-bottom: 10px; }
+/* Seconds lighter, so 1:50:47 (hours) and 50:47 (minutes) are told apart at a glance. */
+.time-value { font-variant-numeric: tabular-nums; }
+.time-value .sec { opacity: .55; }
+
+progress.download { display: block; width: 100%; height: 6px; margin-top: 6px;
+  accent-color: var(--control); }
+
+.main-actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+.main-actions button { min-height: 60px; padding: 6px 4px; font-size: 15px; }
+.main-actions .primary { font-size: 18px; }
+button.stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+button.stacked .icon { font-size: 18px; }
+button.stacked small { font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums;
+  white-space: normal; text-align: center; }
+
+.progress { display: flex; align-items: center; gap: 8px; margin: -4px 0 10px; }
+.progress input { flex: 1; accent-color: var(--control); height: 28px; }
+.progress .time { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums;
+  min-width: 4ch; text-align: center; }
+
+.more-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.more-actions button { flex: 1; font-size: 14px; padding: 8px 6px; }
+.more-actions button.on { border-color: var(--link); color: var(--link); }
+
+.volume { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.volume input { flex: 1; accent-color: var(--control); height: 32px; }
+.volume input.muted { opacity: .4; }
+.mute-btn { min-width: 44px; padding: 4px; font-size: 20px; border: 0; background: none; }
+.mute-btn.on { color: var(--danger); }
+.volume span { width: 3ch; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+details { margin-top: 10px; }
+summary { cursor: pointer; color: var(--muted); font-size: 14px; padding: 6px 0; }
+.history { list-style: none; margin: 0; padding: 0; }
+.history .result { padding: 8px 4px; }
+
+.stereo p { margin: 6px 0; }
+/* Apple TV pairing: the PIN the TV shows */
+.pair-hint { margin: 6px 0 10px; color: var(--muted); font-size: 14px; }
+.pair-form { display: flex; gap: 8px; }
+.pair-form .pin { width: 7em; text-align: center; letter-spacing: .3em; font-size: 20px; }
+.balance-row { display: flex; justify-content: center; }
+
+.support { display: flex; justify-content: center; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
+.support-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--text); /* white at night, dark by day: calm, not playful */
+  background: var(--card); /* like the speaker cards, so they stand out from the sky */
+  color: var(--text);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+
+footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
+/* The links at the bottom sit on the tiled sky: a card-coloured pill keeps them readable. */
+footer button.link, #version, .login .small a {
+  background: var(--card);
+  border-radius: 999px;
+  padding: 8px 16px;
+}
+#version { width: fit-content; margin: 10px auto 0; padding: 4px 12px; }
+#version:empty { display: none; }
+.login .small a { display: inline-block; }
+
+/* links that look like buttons (e.g. "open issue") */
+a.button {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  text-decoration: none;
+  font-size: 17px;
+}
+a.button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+
+/* bottom sheet */
+.sheet {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 20;
+}
+.sheet-panel {
+  background: var(--card);
+  width: 100%;
+  max-width: 640px;
+  border-radius: 18px 18px 0 0;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+}
+.sheet-title { font-weight: 600; margin: 0 0 4px; }
+.sheet-speakers { display: grid; gap: 8px; margin: 10px 0; }
+.sheet-speakers button { min-height: 52px; font-size: 17px; text-align: left; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: 10px;
+  max-width: calc(100% - 32px);
+  z-index: 30;
+}
+
+/* Shown instead of an empty page when AirMan can not start */
+.start-error {
+  max-width: 360px;
+  margin: 20vh auto 0;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--text);
+  text-align: center;
+}
+.start-error p { margin: 0 0 12px; }
+
+/* Multiroom groups: a coloured edge shows which speakers play together */
+.card[data-group="1"] { box-shadow: inset 5px 0 0 #E8833A; }
+.card[data-group="2"] { box-shadow: inset 5px 0 0 #3FA7D6; }
+.card[data-group="3"] { box-shadow: inset 5px 0 0 #59C36A; }
+.card[data-group="4"] { box-shadow: inset 5px 0 0 #B07CE8; }
+.card[data-group="5"] { box-shadow: inset 5px 0 0 #E85A8A; }
+.group-btn { white-space: nowrap; }

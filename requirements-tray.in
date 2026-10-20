@@ -1,0 +1,5 @@
+# Optional: system tray icon (python -m airman --tray, AirMan.exe).
+# Locked on Windows; other platforms may need extra packages (python-xlib, pyobjc).
+-c requirements.txt
+pystray
+Pillow

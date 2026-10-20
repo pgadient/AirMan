@@ -1,0 +1,3 @@
+# Only for building AirMan.exe, not part of the program.
+-c requirements-tray.txt
+pyinstaller

@@ -1,0 +1,2 @@
+# Only for the CI job that checks dependencies for known vulnerabilities.
+pip-audit

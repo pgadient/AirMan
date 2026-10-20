@@ -1,0 +1,36 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time! The "Report bug" button in AirMan fills in
+        the version for you and lets you copy the logs.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: speakers
+    attributes:
+      label: Speakers
+      description: e.g. "HomePod mini (stereo pair)", "HomePod 2", "AirPort Express"
+  - type: input
+    id: version
+    attributes:
+      label: AirMan version and system
+      description: Filled in automatically when you use the button in AirMan.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: |
+        "Report bug" → "Copy logs" in AirMan, then paste here. Logs contain no
+        passwords, but please have a quick look before posting.
+      render: text

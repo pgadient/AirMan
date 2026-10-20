@@ -1,0 +1,49 @@
+# Runtime data: passwords, sessions, history, downloaded audio. Never commit.
+/data/
+*.cookies.txt
+cookies*.txt
+auth.json
+sessions.json
+state.json
+pairings.json
+FIRST-PASSWORD.txt
+tls/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Build output
+/build/
+/dist/
+*.spec.bak
+
+# Bundled third-party binaries (download them yourself, see README)
+/bin/
+ffmpeg.exe
+ffprobe.exe
+deno.exe
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.claude/
+
+# Standalone program run from the project folder
+/AirMan.exe
+/AirMan.exe.old
+/AirMan.exe.new
+
+# Keys and certificates must never be committed (the signing key lives outside the repo)
+*.pem
+*.key
+*.p12
+*.pfx
+.airman-release/
+.env
